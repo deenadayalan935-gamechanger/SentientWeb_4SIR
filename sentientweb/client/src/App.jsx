@@ -1,9 +1,28 @@
 import { useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import useSocket from './hooks/useSocket.js';
 import TacticalMap from './components/Map/TacticalMap.jsx';
 import AlertPanel from './components/AlertPanel/AlertPanel.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import { useAuth } from './context/AuthContext.jsx';
+
+function StatusDot({ active, color }) {
+  return (
+    <motion.div
+      animate={{ opacity: active ? [1, 0.3, 1] : 1 }}
+      transition={{ duration: 1.5, repeat: Infinity }}
+      style={{
+        width: '7px',
+        height: '7px',
+        borderRadius: '50%',
+        backgroundColor: active ? color : '#4a7fa5',
+        boxShadow: active ? '0 0 6px ' + color : 'none',
+        display: 'inline-block',
+        marginRight: '5px'
+      }}
+    />
+  );
+}
 
 function Dashboard() {
   const { telemetry, connected, alerts, redAlert } = useSocket();
@@ -27,98 +46,210 @@ function Dashboard() {
       display: 'flex',
       flexDirection: 'column',
       overflow: 'hidden',
-      transition: 'background-color 0.3s'
+      transition: 'background-color 0.5s'
     }}>
 
-      {/* Header */}
+      {/* Animated Background Grid */}
       <div style={{
-        backgroundColor: redAlert ? '#2a0000' : '#0a1628',
-        borderBottom: '1px solid ' + (redAlert ? '#ff2222' : '#1a3a5c'),
-        padding: '8px 20px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        transition: 'all 0.3s'
-      }}>
+        position: 'fixed',
+        inset: 0,
+        backgroundImage: `
+          linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px)
+        `,
+        backgroundSize: '40px 40px',
+        pointerEvents: 'none',
+        zIndex: 0
+      }} />
 
+      {/* Header */}
+      <motion.div
+        initial={{ y: -60, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        style={{
+          backgroundColor: redAlert
+            ? 'rgba(42,0,0,0.95)'
+            : 'rgba(10,22,40,0.95)',
+          borderBottom: '1px solid ' + (redAlert ? '#ff2222' : '#1a3a5c'),
+          padding: '8px 20px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          backdropFilter: 'blur(12px)',
+          zIndex: 10,
+          position: 'relative'
+        }}
+      >
         {/* Left — Title */}
-        <h1 style={{
-          color: redAlert ? '#ff2222' : '#00d4ff',
-          fontSize: '1.1rem',
-          margin: 0,
-          letterSpacing: '2px'
-        }}>
-          SENTIENTWEB — C4ISR DASHBOARD
-          {redAlert && (
-            <span style={{
-              marginLeft: '12px',
-              color: '#ff2222',
-              animation: 'pulseBorder 0.5s infinite'
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+            style={{
+              width: '24px',
+              height: '24px',
+              border: '2px solid #00d4ff',
+              borderTop: '2px solid transparent',
+              borderRadius: '50%'
+            }}
+          />
+          <div>
+            <h1 style={{
+              color: redAlert ? '#ff2222' : '#00d4ff',
+              fontSize: '1rem',
+              margin: 0,
+              letterSpacing: '3px',
+              fontWeight: 'bold'
             }}>
-              RED ALERT
-            </span>
-          )}
-        </h1>
+              SENTIENTWEB
+            </h1>
+            <p style={{
+              color: '#4a7fa5',
+              fontSize: '0.6rem',
+              margin: 0,
+              letterSpacing: '2px'
+            }}>
+              C4ISR TACTICAL DASHBOARD
+            </p>
+          </div>
+          <AnimatePresence>
+            {redAlert && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: [1, 0.4, 1], scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5, repeat: Infinity }}
+                style={{
+                  color: '#ff2222',
+                  fontSize: '0.75rem',
+                  fontWeight: 'bold',
+                  letterSpacing: '2px',
+                  padding: '3px 10px',
+                  border: '1px solid #ff2222',
+                  borderRadius: '4px'
+                }}
+              >
+                ⚠ RED ALERT
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
         {/* Right — Status Bar */}
         <div style={{
           display: 'flex',
           gap: '16px',
           alignItems: 'center',
-          fontSize: '0.72rem'
+          fontSize: '0.68rem'
         }}>
-          <span style={{ color: '#4a7fa5' }}>
-            {user.role.toUpperCase()}:
-            <span style={{ color: '#00d4ff' }}> {user.username}</span>
-          </span>
-          <span style={{ color: connected ? '#00ff88' : '#ff2222' }}>
-            {connected ? '● CONNECTED' : '● DISCONNECTED'}
-          </span>
-          <span style={{ color: '#00ff88' }}>● AI ACTIVE</span>
-          <span style={{ color: '#00ff88' }}>● DB SYNCED</span>
-          <span style={{
-            backgroundColor: alerts.length > 0 ? '#ff2222' : '#1a3a5c',
-            color: '#fff',
-            padding: '2px 10px',
-            borderRadius: '10px',
-            fontWeight: 'bold'
+          {/* User */}
+          <div style={{
+            color: '#4a7fa5',
+            padding: '3px 10px',
+            border: '1px solid #1a3a5c',
+            borderRadius: '4px',
+            backgroundColor: 'rgba(10,22,40,0.8)'
           }}>
-            THREATS: {alerts.length}
-          </span>
-          <button
+            <span style={{ color: '#00d4ff' }}>{user.role.toUpperCase()}</span>
+            <span style={{ color: '#4a7fa5' }}> / </span>
+            <span style={{ color: '#e0f4ff' }}>{user.username}</span>
+          </div>
+
+          {/* Status indicators */}
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <span>
+              <StatusDot active={connected} color="#00ff88" />
+              <span style={{ color: connected ? '#00ff88' : '#ff2222' }}>
+                {connected ? 'LIVE' : 'OFFLINE'}
+              </span>
+            </span>
+            <span>
+              <StatusDot active={true} color="#00d4ff" />
+              <span style={{ color: '#00d4ff' }}>AI</span>
+            </span>
+            <span>
+              <StatusDot active={true} color="#00ff88" />
+              <span style={{ color: '#00ff88' }}>DB</span>
+            </span>
+          </div>
+
+          {/* Threat counter */}
+          <motion.div
+            key={alerts.length}
+            initial={{ scale: 1.3 }}
+            animate={{ scale: 1 }}
+            style={{
+              backgroundColor: alerts.length > 0 ? '#ff2222' : '#1a3a5c',
+              color: '#fff',
+              padding: '3px 12px',
+              borderRadius: '12px',
+              fontWeight: 'bold',
+              fontSize: '0.72rem',
+              boxShadow: alerts.length > 0
+                ? '0 0 10px rgba(255,34,34,0.4)'
+                : 'none'
+            }}
+          >
+            {alerts.length} THREATS
+          </motion.div>
+
+          {/* Logout */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={logout}
             style={{
               backgroundColor: 'transparent',
               border: '1px solid #1a3a5c',
               color: '#4a7fa5',
-              padding: '3px 10px',
+              padding: '4px 12px',
               borderRadius: '4px',
               cursor: 'pointer',
               fontFamily: 'Courier New',
-              fontSize: '0.68rem'
+              fontSize: '0.65rem',
+              letterSpacing: '1px'
             }}
           >
             LOGOUT
-          </button>
+          </motion.button>
         </div>
-      </div>
+      </motion.div>
 
       {/* Main Layout */}
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      <div style={{
+        display: 'flex',
+        flex: 1,
+        overflow: 'hidden',
+        position: 'relative',
+        zIndex: 1
+      }}>
 
         {/* Map Panel */}
-        <div style={{ flex: 2, position: 'relative' }}>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          style={{ flex: 2, position: 'relative' }}
+        >
           <TacticalMap telemetry={telemetry} alerts={alerts} />
-        </div>
+        </motion.div>
 
         {/* Right Panel */}
-        <div style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          borderLeft: '1px solid ' + (redAlert ? '#ff2222' : '#1a3a5c'),
-          overflow: 'hidden'
-        }}>
+        <motion.div
+          initial={{ x: 100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            borderLeft: '1px solid ' + (redAlert ? '#ff2222' : '#1a3a5c'),
+            overflow: 'hidden',
+            backgroundColor: 'rgba(8,15,24,0.92)',
+            backdropFilter: 'blur(12px)'
+          }}
+        >
 
           {/* Alert Panel */}
           <div style={{
@@ -132,7 +263,6 @@ function Dashboard() {
           {/* Telemetry Feed */}
           <div style={{
             flex: 1,
-            backgroundColor: '#080f18',
             overflowY: 'auto',
             padding: '8px'
           }}>
@@ -141,51 +271,81 @@ function Dashboard() {
               borderBottom: '1px solid #1a3a5c',
               marginBottom: '8px',
               color: '#4a7fa5',
-              fontSize: '0.72rem'
+              fontSize: '0.68rem',
+              letterSpacing: '2px',
+              display: 'flex',
+              justifyContent: 'space-between'
             }}>
-              LIVE TELEMETRY FEED
+              <span>LIVE TELEMETRY</span>
+              <motion.span
+                animate={{ opacity: [1, 0.3, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+                style={{ color: '#00ff88', fontSize: '0.6rem' }}
+              >
+                ● STREAMING
+              </motion.span>
             </div>
 
-            {telemetry.map((t, index) => (
-              <div key={index} style={{
-                backgroundColor: '#0d1f2d',
-                border: '1px solid #1a3a5c',
-                borderRadius: '4px',
-                padding: '6px 8px',
-                marginBottom: '5px',
-                fontSize: '0.68rem'
-              }}>
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  marginBottom: '3px'
-                }}>
-                  <span style={{ color: '#00ff88', fontWeight: 'bold' }}>
-                    [{t.unit_id}]
-                  </span>
-                  <span style={{
-                    backgroundColor: '#1a3a5c',
-                    color: '#00d4ff',
-                    padding: '0px 5px',
-                    borderRadius: '3px',
-                    fontSize: '0.62rem'
+            <AnimatePresence>
+              {telemetry.map((t, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                  whileHover={{
+                    backgroundColor: 'rgba(0,212,255,0.05)',
+                    transition: { duration: 0.1 }
+                  }}
+                  style={{
+                    backgroundColor: 'rgba(13,31,45,0.8)',
+                    border: '1px solid #1a3a5c',
+                    borderRadius: '4px',
+                    padding: '6px 8px',
+                    marginBottom: '5px',
+                    fontSize: '0.65rem',
+                    cursor: 'default'
+                  }}
+                >
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    marginBottom: '3px'
                   }}>
-                    {t.unit_type}
-                  </span>
-                </div>
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  color: '#4a7fa5'
-                }}>
-                  <span>{t.lat.toFixed(3)}, {t.lng.toFixed(3)}</span>
-                  <span style={{ color: '#aaccdd' }}>SPD: {t.speed}</span>
-                </div>
-              </div>
-            ))}
+                    <span style={{
+                      color: '#00ff88',
+                      fontWeight: 'bold',
+                      letterSpacing: '1px'
+                    }}>
+                      [{t.unit_id}]
+                    </span>
+                    <span style={{
+                      backgroundColor: 'rgba(0,212,255,0.1)',
+                      color: '#00d4ff',
+                      padding: '0px 5px',
+                      borderRadius: '3px',
+                      fontSize: '0.6rem',
+                      border: '1px solid rgba(0,212,255,0.2)'
+                    }}>
+                      {t.unit_type}
+                    </span>
+                  </div>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    color: '#4a7fa5'
+                  }}>
+                    <span>{t.lat.toFixed(3)}, {t.lng.toFixed(3)}</span>
+                    <span style={{ color: '#aaccdd' }}>
+                      {t.speed} kmh
+                    </span>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
 
-        </div>
+        </motion.div>
       </div>
     </div>
   );
