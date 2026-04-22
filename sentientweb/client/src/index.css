@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg-primary: #050a0e;
+  --color-bg-secondary: #0a1628;
+  --color-bg-panel: #0d1f2d;
+  --color-accent-green: #00ff88;
+  --color-accent-cyan: #00d4ff;
+  --color-alert-red: #ff2222;
+  --color-text-primary: #e0f4ff;
+  --color-text-muted: #4a7fa5;
+  --color-border: #1a3a5c;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: 'Courier New', Courier, monospace;
+  overflow: hidden;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--color-bg-secondary); }
+::-webkit-scrollbar-thumb { background: var(--color-accent-cyan); border-radius: 2px; }
+
+.glow-green { text-shadow: 0 0 8px #00ff88, 0 0 16px #00ff8844; }
+.glow-cyan  { text-shadow: 0 0 8px #00d4ff, 0 0 16px #00d4ff44; }
+.glow-red   { text-shadow: 0 0 8px #ff2222, 0 0 16px #ff222244; }
+
+body.red-alert {
+  animation: alertPulse 0.8s infinite alternate;
+}
+
+@keyframes alertPulse {
+  from { background-color: #050a0e; }
+  to   { background-color: #1a0000; }
+}
+
+.leaflet-container {
+  background: #050a0e !important;
+}
+
+@keyframes pulseBorder {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+@keyframes pulseMarker {
+  0%   { transform: scale(1); opacity: 1; }
+  50%  { transform: scale(1.8); opacity: 0.3; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulseRing {
+  0%   { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
