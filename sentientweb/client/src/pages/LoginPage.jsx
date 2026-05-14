@@ -77,7 +77,7 @@ function LoginPage() {
         pointerEvents: 'none'
       }} />
 
-      {/* Glowing orb */}
+      {/* Glow Orb */}
       <div style={{
         position: 'absolute',
         width: '400px',
@@ -96,12 +96,11 @@ function LoginPage() {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
         style={{
-          backgroundColor: 'rgba(10,22,40,0.92)',
+          backgroundColor: 'rgba(10,22,40,0.95)',
           border: '1px solid #1a3a5c',
           borderRadius: '10px',
           padding: '40px',
           width: '380px',
-          backdropFilter: 'blur(16px)',
           boxShadow: '0 0 40px rgba(0,212,255,0.08)',
           position: 'relative',
           zIndex: 1
@@ -115,7 +114,6 @@ function LoginPage() {
           transition={{ delay: 0.2, duration: 0.4 }}
           style={{ textAlign: 'center', marginBottom: '30px' }}
         >
-          {/* Spinning radar icon */}
           <div style={{
             display: 'flex',
             justifyContent: 'center',
@@ -144,7 +142,11 @@ function LoginPage() {
           }}>
             SENTIENTWEB
           </h1>
-          <p style={{ color: '#4a7fa5', fontSize: '0.65rem', letterSpacing: '3px' }}>
+          <p style={{
+            color: '#4a7fa5',
+            fontSize: '0.65rem',
+            letterSpacing: '3px'
+          }}>
             C4ISR TACTICAL DASHBOARD
           </p>
           <div style={{
@@ -153,7 +155,11 @@ function LoginPage() {
             backgroundColor: '#1a3a5c',
             margin: '12px auto'
           }} />
-          <p style={{ color: '#4a7fa5', fontSize: '0.65rem', letterSpacing: '2px' }}>
+          <p style={{
+            color: '#4a7fa5',
+            fontSize: '0.65rem',
+            letterSpacing: '2px'
+          }}>
             {isRegister ? 'CREATE ACCOUNT' : 'OPERATOR LOGIN'}
           </p>
         </motion.div>
@@ -229,10 +235,7 @@ function LoginPage() {
             <select
               value={role}
               onChange={(e) => setRole(e.target.value)}
-              style={{
-                ...inputStyle,
-                cursor: 'pointer'
-              }}
+              style={{ ...inputStyle, cursor: 'pointer' }}
             >
               <option value="operator">Operator</option>
               <option value="commander">Commander</option>
@@ -304,8 +307,7 @@ function LoginPage() {
               fontSize: '0.68rem',
               cursor: 'pointer',
               letterSpacing: '1px',
-              textDecoration: 'underline',
-              transition: 'color 0.2s'
+              textDecoration: 'underline'
             }}
           >
             {isRegister
